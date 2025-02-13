@@ -18,7 +18,7 @@ def calc_GW(max_degree: int) -> np.array:
     N = np.zeros((max_degree+1,2*max_degree+1),Fraction)
     
     # Initial values
-    N[0][0] = Fraction(1,1)
+    N[0] = np.nan
     N[1][2] = Fraction(1,1)
     
     for d in range(1,len(N)):
@@ -53,8 +53,8 @@ def calc_GW(max_degree: int) -> np.array:
 
 def GW_table(max_degree: int) -> pd.DataFrame:
     N = calc_GW(max_degree)
-    table = pd.DataFrame(N,
-                         index = range(max_degree+1),
+    table = pd.DataFrame(N[1:],
+                         index = range(1,max_degree+1),
                          columns = range(2*max_degree+1))
     return table
 
