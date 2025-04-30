@@ -2,11 +2,10 @@
 from math import comb
 import numpy as np
 import pandas as pd
-from fractions import Fraction
-
-np.set_printoptions(suppress=True)
+from fractions import Fraction # GW invariants are rational, so this is more precise
 
 def combb(n,r):
+    # A binomial that returns zero whenever arguments are illegal
     if n<0 or r<0:
         return 0
     else:
@@ -52,10 +51,12 @@ def calc_GW(max_degree: int) -> np.array:
 
 
 def GW_table(max_degree: int) -> pd.DataFrame:
+    # Turn GWs into table
     N = calc_GW(max_degree)
     table = pd.DataFrame(N[1:],
                          index = range(1,max_degree+1),
                          columns = range(2*max_degree+1))
+    table.columns.name = "d\\n"
     return table
 
 GW_table(6)
