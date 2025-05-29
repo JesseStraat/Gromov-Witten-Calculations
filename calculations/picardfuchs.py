@@ -1,4 +1,4 @@
-from sympy import diff, symbols, Function, latex, expand, collect, Derivative, Matrix, zeros, simplify
+from sympy import diff, symbols, Function, latex, expand, collect, Derivative, Matrix, zeros, simplify, fraction
 from os import system
 
 # This scripts calculates the Picard-Fuchs equation of the quintic mirror
@@ -96,7 +96,7 @@ with open("picardfuchs.tex", "w") as f_out:
 \\usepackage{amsmath}
 \\begin{document}
 \\(\\begin{gathered}
-""" +  ",\\\\\n".join(latex(eq) + "=0" for eq in get_PF_eqs(f(z))) + """.
+""" +  ",\\\\\n".join(latex(fraction(eq)[0]) + "=0" for eq in get_PF_eqs(f(z))) + """.
 \\end{gathered}\\)
 \\end{document}
 """)
