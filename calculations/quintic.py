@@ -1,4 +1,4 @@
-from sympy import symbols, Symbol, bell
+from sympy import symbols, Symbol, bell, expand
 from sympy.polys.polytools import Poly
 from math import factorial
 from fractions import Fraction
@@ -25,16 +25,14 @@ def truncate_poly(f: Poly, degree: int) -> Poly:
             result[monomials[i]] = coeffs[i]
     return Poly.from_dict(result, *f.gens)
 
-def division(f: TaylorSeries, g:TaylorSeries, degree: int, variable: Symbol) -> Poly:
+def division(f: Poly, g:Poly, degree: int, variable: Symbol) -> Poly:
     # Divides two Taylor series up to some degree
-    f_poly = f.as_polynomial(degree=degree, variable=variable)
-    g_poly = g.as_polynomial(degree=degree, variable=variable)
-    g_const = g_poly.coeff_monomial(1)
-    g_new = g_poly - g_const
+    g_const = g.coeff_monomial(1)
+    g_new = g - g_const
     result = 0
     for n in range(0,degree+1):
         result += (-1)**n*Fraction(1,g_const**n)*g_new**n
-    return truncate_poly(f_poly*result, degree)
+    return truncate_poly(f*result, degree)
 
 def exponentiation(f: Poly, degree: int) -> Poly:
     # Exponentiates some polynomial up to some degree
@@ -57,7 +55,7 @@ def lagrange_bell_invert(f: Poly, old_variable: Symbol, new_variable: Symbol) ->
                     funct_tup = tuple(fhat_list[i] for i in range(1,n-k+1))
                     res += (-1)**k*Fraction(factorial(n+k-1),factorial(n-1))*bell(n-1,k,funct_tup)
                 g += res*Fraction(1,f_list[1]**n*factorial(n))*new_variable**n
-            return g
+            return g.as_poly()
         else:
             raise Exception("This function has a nonzero constant term, so the algorithm doesn't apply.")
     else:
@@ -66,6 +64,8 @@ def lagrange_bell_invert(f: Poly, old_variable: Symbol, new_variable: Symbol) ->
 
 if __name__ == "__main__":
     b, q = symbols('b q')
+
+    degree = 5
     
     omega0 = TaylorSeries(nthterm = lambda n : Fraction(factorial(5*n),(factorial(n))**5))
 
@@ -76,7 +76,23 @@ if __name__ == "__main__":
         return result
     psi = TaylorSeries(nthterm = lambda n : Fraction(5*factorial(5*n),(factorial(n))**5)*sum_of_recips(n))
 
-    q_func = b*exponentiation(division(psi,omega0,5,b), 5)
+    q_func = b*exponentiation(division(psi.as_polynomial(degree+1,b),omega0.as_polynomial(degree,b),degree,b),degree)
     b_func = lagrange_bell_invert(q_func,b,q)
+    #omega0_q = truncate_poly(omega0.as_polynomial(degree,b).compose(b_func),degree)
+    yukawa_B = division(1,(1-5**5*b)*omega0.as_polynomial(degree,b)**2,degree,b)
+    yukawa_A = truncate_poly(Poly(truncate_poly(truncate_poly(yukawa_B*(q_func/b)**3,degree).compose(b_func),degree),q)*b_func.diff()**3,degree)
 
-    print(b_func)
+    print("q(b) = " + str(q_func.as_expr()))
+    print("b(q) = " + str(b_func.as_expr()))
+    print("<θθθ> = " + str(5*yukawa_A.as_expr()))
+
+    N = [5*yukawa_A.as_expr().coeff(q,0)] + [5*yukawa_A.as_expr().coeff(q,i)/i**3 for i in range(1,degree+1)]
+    print("N = " + str(N))
+
+    N_temp = N.copy()
+    n = [N[0]]
+    for i in range(1,degree+1):
+        n.append(N_temp[i])
+        for k in range(1,degree//i+1):
+            N_temp[i*k] = N_temp[i*k] - Fraction(n[i],k**3)
+    print("n = " + str(n))
