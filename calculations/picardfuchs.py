@@ -84,7 +84,7 @@ def get_PF_eqs(f_sym):
         for j in range(4):
             if (i,j) not in [(0,1),(1,2),(2,3)]:
                 if conn_matrix[i,j] != 0:
-                    output.append(conn_matrix[i,j])
+                    output.append(fraction(conn_matrix[i,j])[0])
     return output
 
 
@@ -96,7 +96,7 @@ with open("picardfuchs.tex", "w") as f_out:
 \\usepackage{amsmath}
 \\begin{document}
 \\(\\begin{gathered}
-""" +  ",\\\\\n".join(latex(fraction(eq)[0]) + "=0" for eq in get_PF_eqs(f(z))) + """.
+""" +  ",\\\\\n".join(latex(eq) + "=0" for eq in get_PF_eqs(f(z))) + """.
 \\end{gathered}\\)
 \\end{document}
 """)
