@@ -63,12 +63,16 @@ def lagrange_bell_invert(f: Poly, old_variable: Symbol, new_variable: Symbol) ->
 
 
 if __name__ == "__main__":
+    # b/q are the complex/Kähler moduli coordinates
     b, q = symbols('b q')
 
+    # Max degree to calculate GWs for
     degree = 5
     
+    # The period
     omega0 = TaylorSeries(nthterm = lambda n : Fraction(factorial(5*n),(factorial(n))**5))
 
+    # The perturbation of the second period
     def sum_of_recips(n: int) -> Fraction:
         result = 0
         for i in range(n+1,5*n+1):
@@ -76,19 +80,25 @@ if __name__ == "__main__":
         return result
     psi = TaylorSeries(nthterm = lambda n : Fraction(5*factorial(5*n),(factorial(n))**5)*sum_of_recips(n))
 
+    # Mirror map q(b)
     q_func = b*exponentiation(division(psi.as_polynomial(degree+1,b),omega0.as_polynomial(degree,b),degree,b),degree)
+    # Mirror map b(q)
     b_func = lagrange_bell_invert(q_func,b,q)
-    #omega0_q = truncate_poly(omega0.as_polynomial(degree,b).compose(b_func),degree)
+    # Yukawa <θθθ>(b) (in B-model)
     yukawa_B = division(1,(1-5**5*b)*omega0.as_polynomial(degree,b)**2,degree,b)
+    # Yukawa <HHH>(q) (in A-model)
     yukawa_A = truncate_poly(Poly(truncate_poly(truncate_poly(yukawa_B*(q_func/b)**3,degree).compose(b_func),degree),q)*b_func.diff()**3,degree)
 
+    # Results
     print("q(b) = " + str(q_func.as_expr()))
     print("b(q) = " + str(b_func.as_expr()))
-    print("<θθθ> = " + str(5*yukawa_A.as_expr()))
+    print("<HHH> = " + str(5*yukawa_A.as_expr()))
 
+    # Gromov-Witten invariants
     N = [5*yukawa_A.as_expr().coeff(q,0)] + [5*yukawa_A.as_expr().coeff(q,i)/i**3 for i in range(1,degree+1)]
     print("N = " + str(N))
 
+    # Instanton numbers
     N_temp = N.copy()
     n = [N[0]]
     for i in range(1,degree+1):
