@@ -92,6 +92,7 @@ if __name__ == "__main__":
     # Results
     print("q(b) = " + str(q_func.as_expr()))
     print("b(q) = " + str(b_func.as_expr()))
+    print("<θθθ> = " + str(5*yukawa_B.as_expr()))
     print("<HHH> = " + str(5*yukawa_A.as_expr()))
 
     # Gromov-Witten invariants
