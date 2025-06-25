@@ -11,7 +11,7 @@ def combb(n,r):
     else:
         return comb(n,r)
 
-def calc_GW(max_degree: int) -> np.array:
+def calc_GW(max_degree: int) -> np.ndarray:
     # max_degree: maximum degree
     # Output: N[d][n] is N_0(n;d)
     N = np.zeros((max_degree+1,2*max_degree+1),Fraction)
@@ -59,5 +59,5 @@ def GW_table(max_degree: int) -> pd.DataFrame:
     table.columns.name = "d\\n"
     return table
 
-GW_table(6)
+GW_table(30) # Anything under 30 is near-instantaneous
 # %%
