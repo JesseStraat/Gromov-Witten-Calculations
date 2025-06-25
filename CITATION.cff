@@ -4,6 +4,6 @@ authors:
 - family-names: "Straat"
   given-names: "Jesse"
 title: "Some Gromov–Witten Invariant Calculations"
-version: 1.0.0
+version: 1.0
 date-released: 2025-06-25
 url: "https://github.com/JesseStraat/Gromov-Witten-Calculations"
